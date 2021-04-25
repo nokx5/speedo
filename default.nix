@@ -3,14 +3,14 @@
 let
   packageOverrides = python-self: python-super: {
     speedo_client = python-super.speedo_client.overrideAttrs (oldAttrs: rec {
-      src = pkgs.nix-gitignore.gitignoreSource [ ".git" ] ./.;
+      src = ./.; # pkgs.nix-gitignore.gitignoreSource [ ".git" ] ./.;
       propagatedBuildInputs = oldAttrs.propagatedBuildInputs
         ++ (with python-self; [ mock ]);
     });
     speedo = python-super.speedo.overrideAttrs (oldAttrs: rec {
       version = "local";
       pname = "${oldAttrs.pname}-${version}";
-      src = pkgs.nix-gitignore.gitignoreSource [ ".git" ] ./.;
+      src = ./.; # pkgs.nix-gitignore.gitignoreSource [ ".git" ] ./.;
       propagatedBuildInputs = oldAttrs.propagatedBuildInputs
         ++ (with python-self; [
           # psycopg2 and alembic are used for the docker postgresql migration
@@ -18,7 +18,7 @@ let
           alembic
           uvicorn
           # additional speedo server packages comes here
-          # prometheus_client fastapi alembic starlette sqlalchemy-utils
+          # prometheus_client fastapi alembic sqlalchemy-utils
         ]);
     });
     dev = python-self.speedo.overrideAttrs (oldAttrs: rec {

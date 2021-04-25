@@ -1,0 +1,70 @@
+#!/bin/bash
+#
+# from https://unix.stackexchange.com/questions/464106/killing-background-processes-started-in-nix-shell
+#
+# Configure and run DB locally
+
+set -eu
+
+do=${1-"help"}
+
+client_pid=$PPID
+
+start_postgres() {
+    if postgres_is_stopped; then
+	logfile="$(dirname $PGHOST)/log/postgresql.log"
+        mkdir -p "$PGHOST" "${logfile%/*}"
+        (set -m
+	   pg_ctl start --silent -w --log "$logfile" -o "-k $PGHOST -h ''")
+    fi
+}
+
+postgres_is_stopped() {
+    pg_ctl status >/dev/null
+    (( $? == 3 ))
+}
+
+case "$do" in
+    clean)
+        rm -rf $(dirname $PGHOST)/{log,pgdata,pids,sockets}
+        ;;
+    add)
+        mkdir -p $(dirname $PGHOST)/pids
+	    touch $(dirname $PGHOST)/pids/$client_pid
+        if [ -d "$PGDATA" ]; then
+            start_postgres
+        else
+            pg_ctl initdb --silent -o '--auth=trust' && start_postgres && createdb $PGDATABASE
+        fi
+        ;;
+    remove)
+        rm $(dirname $PGHOST)/pids/$client_pid
+        if [ -n "$(find $(dirname $PGHOST)/pids -prune -empty)" ]; then
+            pg_ctl stop --silent -W
+	    rm -rf $(dirname $PGHOST)/{log,pgdata,pids,sockets}
+        fi
+        ;;
+    *)
+        echo "Usage: ${BASH_SOURCE[0]##*/} {add | remove | clean}"
+        echo ""
+        echo "with"
+        echo ""
+        echo "export PGHOST=\"$PWD/scripts/localdb/sockets\""
+        echo "export PGDATA=\"$PWD/scripts/localdb/pgdata\""
+        echo "export PGPORT=\"5432\""
+        echo "export PGDATABASE=\"speedoDB\""
+        echo "export PGUSER=\"\$USER\""
+        echo "export PGPASS=\"\""
+	    echo ""
+	    echo "# example of execution :"
+	    echo "" 
+	    echo "trap \"$PWD/scripts/rundb_postgresql remove\" EXIT"
+	    echo "$PWD/scripts/rundb_postgresql add"
+	    echo ""
+	    echo "### From there you can check if the database is accessible."
+	    echo "# # list tables"
+        echo "# psql --host \$PGHOST -U \$PGUSER -p \$PGPORT -d \$PGDATABASE -c '\d'"
+	    echo ""
+        exit 1
+        ;;
+esac

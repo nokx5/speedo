@@ -2,7 +2,7 @@
 # mypy: ignore-errors
 #
 #
-# Speedo - it
+# Speedo
 #
 #
 
