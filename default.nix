@@ -18,10 +18,16 @@ let
             psycopg2
           ]);
     });
-    dev = python-self.speedo.overrideAttrs (oldAttrs: rec {
-      nativeBuildInputs = (with pkgs; [ less cacert git curl postgresql ]);
+    speedo_full = python-super.speedo.overrideAttrs (oldAttrs: rec {
+      nativeBuildInputs = (with pkgs; [ curl postgresql ]);
       propagatedBuildInputs = oldAttrs.propagatedBuildInputs
         ++ python-self.speedo_client.propagatedBuildInputs
+        ++ (with python-self; [ sphinx ]);
+      propagatedNativeBuildInputs = (with python-self; [ sphinx ]);
+    });
+    dev = python-self.speedo_full.overrideAttrs (oldAttrs: rec {
+      nativeBuildInputs = (with pkgs; [ cacert git less ]);
+      propagatedBuildInputs = oldAttrs.propagatedBuildInputs
         ++ (with python-self; [
           pip
           black
