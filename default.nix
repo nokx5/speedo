@@ -3,32 +3,26 @@
 let
   packageOverrides = python-self: python-super: {
     speedo_client = python-super.speedo_client.overrideAttrs (oldAttrs: rec {
-      src = ./.; # pkgs.nix-gitignore.gitignoreSource [ ".git" ] ./.;
+      src = ./.;
       propagatedBuildInputs = oldAttrs.propagatedBuildInputs
         ++ (with python-self; [ mock ]);
     });
     speedo = python-super.speedo.overrideAttrs (oldAttrs: rec {
       version = "local";
       pname = "${oldAttrs.pname}-${version}";
-      src = ./.; # pkgs.nix-gitignore.gitignoreSource [ ".git" ] ./.;
+      src = ./.;
       propagatedBuildInputs = oldAttrs.propagatedBuildInputs
-        ++ (with python-self; [
-          # psycopg2 and alembic are used for the docker postgresql migration
-          psycopg2
-          alembic
-          uvicorn
-          # additional speedo server packages comes here
-          # prometheus_client fastapi alembic sqlalchemy-utils
-        ]);
+        ++ (with python-self;
+          [
+            # psycopg2 is used for the docker postgresql migration
+            psycopg2
+          ]);
     });
     dev = python-self.speedo.overrideAttrs (oldAttrs: rec {
-      version = "dev";
-      pname = "${oldAttrs.pname}-${version}";
-      src = pkgs.nix-gitignore.gitignoreSource [ ".git" ] ./.;
       nativeBuildInputs = (with pkgs; [ less cacert git curl postgresql ]);
       propagatedBuildInputs = oldAttrs.propagatedBuildInputs
         ++ python-self.speedo_client.propagatedBuildInputs
-        ++ (with python-super; [
+        ++ (with python-self; [
           pip
           black
           mypy
@@ -38,7 +32,7 @@ let
           pytestcov
           sphinx
         ]);
-      propagatedNativeBuildInputs = (with python-super; [
+      propagatedNativeBuildInputs = (with python-self; [
         pip
         black
         mypy
@@ -50,6 +44,14 @@ let
         uvicorn
         alembic
       ]);
+      shellHook = ''
+                export SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
+            	export PYTHONPATH=$PWD:$PYTHONPATH
+        	echo ""
+        	echo "You may be interested in the SQL queries :"
+                echo "export DEBUG_SPEEDO_SQL=ENABLED"
+        	echo ""
+            '';
     });
   };
 
@@ -60,15 +62,13 @@ let
   });
 
   python3Packages = python3.pkgs;
-
-  speedo = python3Packages.speedo;
   dev = python3Packages.dev;
 
   speedo-docker-image = pkgs.dockerTools.buildLayeredImage {
     inherit tag;
     name = "speedo";
     created = "now";
-    contents = [ speedo ];
+    contents = [ python3Packages.speedo ];
     config = {
       Cmd = [ "speedo" ];
       Env = [ "SPEEDO_ALEMBIC=ENABLED" ];
