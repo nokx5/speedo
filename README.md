@@ -1,8 +1,7 @@
 # Speedo, 
 
 Speedo is a lightweight python client library and server
-(fastAPI+sqlalchemy).  It helps the communication between the
-production of meta-data in the pipeline and the database.
+(fastAPI+sqlalchemy).
 
 The database is created via [Object Relational Mappers (SQLAlchemy
 ORM)](https://docs.sqlalchemy.org/en/14/orm/) using either :
