@@ -34,21 +34,8 @@ in mkShell {
     export SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt
     export PYTHONPATH=$PWD:$PYTHONPATH
     echo ""
-    echo "Welcome to the developer shell of submission report"
-    echo ""
-    echo ""
-    echo "You may want to run the postgresql database manually (run all the following commands):"
-    echo ""    
-    echo "export PGDATABASE=srdb"
-    echo "export PGDATA=\$PWD/nix/pgdata"
-    echo "export PGHOST=\$PWD/nix/sockets"
-    echo "export PGPORT=5433"
-    echo "export PGUSER=$USER"
-    echo "export PGPASS="
-    echo "trap \"\$PWD/nix/client remove\" EXIT"
-    echo "\$PWD/nix/client add"
-    echo "export PYTHONPATH=\$PWD:\$PYTHONPATH"
-    echo "export DEBUG_SUBMISSION_REPORTS_SQL=ENABLED"
+    echo "You may be interested in the SQL queries :"
+    echo "export DEBUG_SPEEDO_SQL=ENABLED"
     echo ""
   '';
 
