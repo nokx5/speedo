@@ -11,17 +11,17 @@ jobs:
       - name: check python formatting
         run: nix-shell -I nixpkgs=https://github.com/nokx5/nokxpkgs/archive/main.tar.gz -p black --run 'black --check .'
       - name: test server (and dependencies)
-	run: nix-build -I nokxpkgs=https://github.com/nokx5/nokxpkgs/archive/main.tar.gz -A python3Packages.speedo --no-out-link
+        run: nix-build -I nokxpkgs=https://github.com/nokx5/nokxpkgs/archive/main.tar.gz -A python3Packages.speedo --no-out-link
       - name: test for sqlite
-        run: nix-shell -I nokxpkgs=https://github.com/nokx5/nokxpkgs/archive/main.tar.gz -A python3Packages.speedo_full --run 'python -m pytest' # test sqlite
-      - name: test for postgresql (for docker image)
-        run: |
-            export WORKSPACE=$PWD # test postgresql
-            export PGHOST="${WORKSPACE/scripts/localdb/sockets" 
-            export PGDATA="${WORKSPACE}/scripts/localdb/pgdata" 
-            export PGPORT="5432" 
-            export PGDATABASE="guestdb" 
-            export PGUSER=guest 
-            export PGPASS="" 
-            nix-shell -I nokxpkgs=https://github.com/nokx5/nokxpkgs/archive/main.tar.gz -A python3Packages.speedo_full --pure --keep PGHOST --keep PGPORT --keep PGDATABASE --keep PGDATA --keep PGUSER --keep PGPASS --run './scripts/rundb_postgresql clean; ./scripts/rundb_postgresql add; python -m pytest; ./scripts/rundb_postgresql remove'
-	    
+        run: nix-shell -I nokxpkgs=https://github.com/nokx5/nokxpkgs/archive/main.tar.gz -A python3Packages.speedo_full --run 'python -m pytest'
+      # - name: test for postgresql (for docker image)
+      #   run: |
+      #       export WORKSPACE="${PWD}"
+      #       export PGHOST="${WORKSPACE/scripts/localdb/sockets" 
+      #       export PGDATA="${WORKSPACE}/scripts/localdb/pgdata" 
+      #       export PGPORT="5432" 
+      #       export PGDATABASE="guestdb" 
+      #       export PGUSER="guest" 
+      #       export PGPASS="" 
+      #       nix-shell -I nokxpkgs=https://github.com/nokx5/nokxpkgs/archive/main.tar.gz -A python3Packages.speedo_full --pure --keep PGHOST --keep PGPORT --keep PGDATABASE --keep PGDATA --keep PGUSER --keep PGPASS --run './scripts/rundb_postgresql clean; ./scripts/rundb_postgresql add; python -m pytest; ./scripts/rundb_postgresql remove'
+      - run: echo "done!"
