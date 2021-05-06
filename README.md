@@ -1,10 +1,9 @@
-# Speedo, 
+# Speedo
 
 Speedo is a lightweight python client library and server
 (fastAPI+sqlalchemy).
 
-The database is created via [Object Relational Mappers (SQLAlchemy
-ORM)](https://docs.sqlalchemy.org/en/14/orm/) using either :
+The database uses either :
 - **sqlite** (in-memory mode) for **development**
 - **postgresql** for **production**
 
@@ -13,8 +12,7 @@ a lightweight database migration tool for versioning the releases.
 
 ## Docs
 
-A simple Live OpenAPI documentation can be found under _<url>/docs_ or
-_<url>/redoc_.
+A simple documentation for the endpoints can be found using the Swagger UI.
 
 ## Use Speedo's client and server
 You can directly use Speedo services via the [nokxpkgs](https://github.com/nokx5/nokxpkgs#add-nokxpkgs-to-your-nix-channel) channel.
@@ -51,7 +49,7 @@ export NIX_PATH=nokxpkgs=https://github.com/nokx5/nokxpkgs/archive/main.tar.gz
 ### Develop using the nix shell
 1. to enter the nix-shell, you have to explicitly call the ```default.nix``` file.
     ```
-    nix-shell --pure -A dev
+    nix-shell -I nokxpkgs=https://github.com/nokx5/nokxpkgs/archive/main.tar.gz --pure -A dev
     ```
 
 2. check python requirements if you are skeptic about nix.
