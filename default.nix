@@ -63,7 +63,7 @@ let
 
   python3 = pkgs.python3.override (old: {
     packageOverrides =
-      pkgs.stdenv.lib.composeExtensions (old.packageOverrides or (_: _: { }))
+      pkgs.lib.composeExtensions (old.packageOverrides or (_: _: { }))
       packageOverrides;
   });
 
